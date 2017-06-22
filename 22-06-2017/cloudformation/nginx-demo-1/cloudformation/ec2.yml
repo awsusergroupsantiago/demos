@@ -1,0 +1,58 @@
+Description: "EC2 Instance For Meetup AWS User Group"
+Resources:
+  InstanceSecurityGroupMeetup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "demo-nginx-1"
+      GroupDescription: "Allow HTTP to EC2 Instance Demo for Meetup AWS User Group"
+      VpcId: "vpc-b0be31d7"
+      SecurityGroupIngress:
+      - IpProtocol: "tcp"
+        FromPort: "80"
+        ToPort: "80"
+        CidrIp: "0.0.0.0/0"
+      - IpProtocol: "tcp"
+        FromPort: "22"
+        ToPort: "22"
+        CidrIp: "0.0.0.0/0"
+      SecurityGroupEgress:
+      - IpProtocol: "-1"
+        CidrIp: "0.0.0.0/0"
+         
+  EC2InstanceMeetup: 
+    Type: "AWS::EC2::Instance"
+    Properties:
+      AvailabilityZone: "us-east-1a"
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", ami]
+      KeyName: "aws-personal"
+      InstanceType:
+        Ref: InstanceTypeParameter
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroupMeetup
+      Tags: 
+        - Key: Name
+          Value: demo-nginx-1
+
+Parameters: 
+  InstanceTypeParameter: 
+    Type: String
+    Default: t2.micro
+    AllowedValues: 
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+    Description: Enter t2.nano, t2.micro, t2.small or t2.medium. Default is t2.micro.
+
+Mappings: 
+  RegionMap: 
+    us-east-1: 
+      "ami": "ami-772aa961"
+    us-west-1: 
+      "ami": "ami-73f7da13"
+
+Outputs:
+  EnvOutput:
+    Description: The Public DNS for EC2 Instance Created
+    Value: !GetAtt EC2InstanceMeetup.PublicDnsName
+  
