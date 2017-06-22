@@ -1,0 +1,4 @@
+---
+env: uat
+ansible_ssh_user: ubuntu
+ansible_ssh_private_key_file: ~/aws-personal.pem
